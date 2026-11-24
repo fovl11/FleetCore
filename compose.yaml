@@ -1,0 +1,42 @@
+name: fleetcore
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fleetcore}
+      POSTGRES_USER: ${POSTGRES_USER:-fleetcore}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fleetcore_local}
+    ports:
+      - "5432:5432"
+    volumes:
+      - fleetcore-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fleetcore} -d ${POSTGRES_DB:-fleetcore}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://fleetcore:fleetcore_local@db:5432/fleetcore}
+      CORS_ORIGINS: http://localhost:5173
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-false}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  fleetcore-postgres:
