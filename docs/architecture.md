@@ -1,15 +1,15 @@
-﻿# Architecture
+# Архитектура
 
-## Runtime shape
+## Структура во время работы
 
-The browser loads the React application from Vite. The application calls the FastAPI JSON API using `VITE_API_BASE_URL`. Compose runs the API and PostgreSQL on a private network; PostgreSQL data is stored in a named volume.
+Браузер загружает React-приложение из Vite. Приложение обращается к JSON API на FastAPI, используя `VITE_API_BASE_URL`. Compose запускает API и PostgreSQL в частной сети; данные PostgreSQL хранятся в именованном томе.
 
-## Initial boundaries
+## Исходные границы компонентов
 
-- **Frontend:** navigation shell and dashboard overview.
-- **Backend:** versioned HTTP API; health route is the first endpoint.
-- **Database:** PostgreSQL is provisioned for upcoming fleet entities. Schema changes will use Alembic migrations as persistence is introduced.
+- **Клиент:** навигационная оболочка и обзорная панель.
+- **Серверная часть:** версионируемый HTTP API; первым добавлен маршрут проверки состояния.
+- **База данных:** PostgreSQL подготовлен для будущих сущностей автопарка. По мере добавления хранения данных изменения схемы будут оформляться миграциями Alembic.
 
-## Growth path
+## Направление развития
 
-Implement fleet capabilities as vertical slices. A vehicle slice, for example, owns its API schemas, domain/application behavior, persistence mapping and migration, frontend API client, and UI. Keep transport and presentation concerns separated. Add authentication and authorization before exposing operational data outside a trusted local environment.
+Добавляйте возможности управления автопарком небольшими вертикальными срезами. Например, срез для транспортных средств включает собственные API-схемы, доменную и прикладную логику, отображение данных в БД и миграцию, клиент для API во frontend и интерфейс. Разделяйте транспортный и презентационный уровни. Добавьте аутентификацию и авторизацию до того, как открывать доступ к рабочим данным за пределами доверенной локальной среды.
